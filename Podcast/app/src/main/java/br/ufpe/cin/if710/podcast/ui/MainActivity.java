@@ -1,7 +1,9 @@
 package br.ufpe.cin.if710.podcast.ui;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.ufpe.cin.if710.podcast.R;
+import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 import br.ufpe.cin.if710.podcast.domain.XmlFeedParser;
 import br.ufpe.cin.if710.podcast.ui.adapter.XmlFeedAdapter;
@@ -76,46 +79,63 @@ public class MainActivity extends Activity {
         adapter.clear();
     }
 
-    private class DownloadXmlTask extends AsyncTask<String, Void, List<ItemFeed>> {
+    private class DownloadXmlTask extends AsyncTask<String, Void, Void> {
         @Override
         protected void onPreExecute() {
             Toast.makeText(getApplicationContext(), "iniciando...", Toast.LENGTH_SHORT).show();
         }
 
         @Override
-        protected List<ItemFeed> doInBackground(String... params) {
+        protected Void doInBackground(String... params) {
             List<ItemFeed> itemList = new ArrayList<>();
             try {
                 itemList = XmlFeedParser.parse(getRssFeed(params[0]));
+                if (itemList.size() > 0) {
+                    getContentResolver().delete(PodcastProviderContract.EPISODE_LIST_URI,null,null);
+                    for (ItemFeed item : itemList) {
+
+                        ContentValues values = new ContentValues();
+                        values.put(PodcastProviderContract.DATE, item.getPubDate());
+                        values.put(PodcastProviderContract.DESCRIPTION, item.getDescription());
+                        values.put(PodcastProviderContract.TITLE, item.getTitle());
+                        values.put(PodcastProviderContract.EPISODE_LINK, item.getLink());
+
+
+                        getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, values);
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (XmlPullParserException e) {
                 e.printStackTrace();
             }
-            return itemList;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(List<ItemFeed> feed) {
+        protected void onPostExecute(Void aVoid) {
             Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
 
-            //Adapter Personalizado
-            XmlFeedAdapter adapter = new XmlFeedAdapter(getApplicationContext(), R.layout.itemlista, feed);
+            Cursor cursor = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,PodcastProviderContract.ALL_COLUMNS,null,null,null);
+            List<ItemFeed> feed = new ArrayList<ItemFeed>();
+            try {
+                while (cursor.moveToNext()) {
+                    String title = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.TITLE));
+                    String description = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DESCRIPTION));
+                    String link = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.EPISODE_LINK));
+                    String date = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DATE));
 
-            //atualizar o list view
-            items.setAdapter(adapter);
-            items.setTextFilterEnabled(true);
-            /*
-            items.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    XmlFeedAdapter adapter = (XmlFeedAdapter) parent.getAdapter();
-                    ItemFeed item = adapter.getItem(position);
-                    String msg = item.getTitle() + " " + item.getLink();
-                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                    feed.add(new ItemFeed(title,link,date,description));
                 }
-            });
-            /**/
+            } finally {
+                cursor.close();
+                //Adapter Personalizado
+                XmlFeedAdapter adapter = new XmlFeedAdapter(getApplicationContext(), R.layout.itemlista, feed);
+
+                //atualizar o list view
+                items.setAdapter(adapter);
+                items.setTextFilterEnabled(true);
+            }
         }
     }
 
