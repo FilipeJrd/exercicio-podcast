@@ -60,7 +60,6 @@ public class XmlFeedParser {
         String link = null;
         String pubDate = null;
         String description = null;
-        String downloadLink = null;
         parser.require(XmlPullParser.START_TAG, null, "item");
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -84,7 +83,7 @@ public class XmlFeedParser {
                 skip(parser);
             }
         }
-        ItemFeed result = new ItemFeed(title, link, pubDate, description);
+        ItemFeed result = new ItemFeed(title, link, pubDate, description,link);
         return result;
     }
 

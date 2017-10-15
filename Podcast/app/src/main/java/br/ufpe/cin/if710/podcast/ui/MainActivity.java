@@ -124,17 +124,29 @@ public class MainActivity extends Activity {
                     String description = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DESCRIPTION));
                     String link = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.EPISODE_LINK));
                     String date = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DATE));
-
-                    feed.add(new ItemFeed(title,link,date,description));
+                    String url = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.EPISODE_LINK));
+                    feed.add(new ItemFeed(title,link,date,description,url));
                 }
             } finally {
                 cursor.close();
                 //Adapter Personalizado
                 XmlFeedAdapter adapter = new XmlFeedAdapter(getApplicationContext(), R.layout.itemlista, feed);
 
-                //atualizar o list view
                 items.setAdapter(adapter);
                 items.setTextFilterEnabled(true);
+
+                items.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        XmlFeedAdapter adapter = (XmlFeedAdapter) parent.getAdapter();
+                        ItemFeed item = adapter.getItem(position);
+                        //atualizar o list view
+                        Intent intent = new Intent(MainActivity.this,EpisodeDetailActivity.class);
+                        intent.putExtra("item",item);
+
+                        MainActivity.this.startActivity(intent);
+                    }
+                });
             }
         }
     }
