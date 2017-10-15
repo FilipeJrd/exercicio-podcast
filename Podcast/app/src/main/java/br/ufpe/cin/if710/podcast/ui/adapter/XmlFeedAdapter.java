@@ -7,9 +7,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+
+import android.content.ClipData;
+import android.content.ContentValues;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -21,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import br.ufpe.cin.if710.podcast.R;
+import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 
 public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
@@ -45,45 +50,71 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        holder.item_title.setText(getItem(position).getTitle());
-        holder.item_date.setText(getItem(position).getPubDate());
-        holder.item_action.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(), "baixando...", Toast.LENGTH_SHORT).show();
+        ItemFeed item = getItem(position);
+        if (item.getUrl() != null && !item.getUrl().isEmpty()){
 
-                class DownloadFile extends AsyncTask<String, Integer, Boolean> {
-                    @Override
-                    protected void onPostExecute(Boolean aBoolean) {
-                        super.onPostExecute(aBoolean);
-                        if (aBoolean) {
-                            Toast.makeText(getContext(), "baixou...", Toast.LENGTH_SHORT).show();
-
-                            holder.item_action.setText("Play");
-                            holder.item_action.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    String filename = getItem(position).getTitle()+".mp3";
-                                    File file = new File(getContext().getFilesDir(),filename);
-                                    try {
-                                        if (player.isPlaying()) {
-                                            player.stop();
-                                            player =  new MediaPlayer();
-                                        }
-                                        player.setDataSource(file.getAbsolutePath());
-                                        player.prepare();
-                                        player.start();
-                                    } catch (IOException e) {
-                                    }
-                                }
-                            });
-                        }else{
-                            Toast.makeText(getContext(), "falhou...", Toast.LENGTH_SHORT).show();
+            holder.item_title.setText(getItem(position).getTitle());
+            holder.item_date.setText(getItem(position).getPubDate());
+            holder.item_action.setText("Play");
+            holder.item_action.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String filename = getItem(position).getUrl();
+                    File file = new File(filename);
+                    try {
+                        if (player.isPlaying()) {
+                            player.stop();
+                            player = new MediaPlayer();
                         }
+                        player.setDataSource(file.getAbsolutePath());
+                        player.prepare();
+                        player.start();
+                    } catch (IOException e) {
                     }
+                }
+            });
+        }else {
 
-                    @Override
-                    protected Boolean doInBackground(String... sUrl) {
+
+            holder.item_title.setText(getItem(position).getTitle());
+            holder.item_date.setText(getItem(position).getPubDate());
+            holder.item_action.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(getContext(), "baixando...", Toast.LENGTH_SHORT).show();
+
+                    class DownloadFile extends AsyncTask<String, Integer, Boolean> {
+                        @Override
+                        protected void onPostExecute(Boolean aBoolean) {
+                            super.onPostExecute(aBoolean);
+                            if (aBoolean) {
+                                Toast.makeText(getContext(), "baixou...", Toast.LENGTH_SHORT).show();
+
+                                holder.item_action.setText("Play");
+                                holder.item_action.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        String filename = getItem(position).getUrl();
+                                        File file = new File(filename);
+                                        try {
+                                            if (player.isPlaying()) {
+                                                player.stop();
+                                                player = new MediaPlayer();
+                                            }
+                                            player.setDataSource(file.getAbsolutePath());
+                                            player.prepare();
+                                            player.start();
+                                        } catch (IOException e) {
+                                        }
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(getContext(), "falhou...", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        protected Boolean doInBackground(String... sUrl) {
                             InputStream input = null;
                             OutputStream output = null;
                             HttpURLConnection connection = null;
@@ -95,7 +126,7 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
                                 // expect HTTP 200 OK, so we don't mistakenly save error report
                                 // instead of the file
                                 if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                                   return false;
+                                    return false;
                                 }
 
                                 // this will be useful to display download percentage
@@ -104,9 +135,9 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
 
                                 // download the file
                                 input = connection.getInputStream();
-                                String filename = getItem(position).getTitle()+".mp3";
-                                File file = new File(getContext().getFilesDir(),filename);
-                                if (file.exists()){
+                                String filename = getItem(position).getTitle() + ".mp3";
+                                File file = new File(getContext().getFilesDir(), filename);
+                                if (file.exists()) {
                                     file.delete();
                                 }
                                 file.createNewFile();
@@ -127,18 +158,24 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
                                     if (fileLength > 0) // only if total length is known
                                         publishProgress((int) (total * 100 / fileLength));
                                     output.write(data, 0, count);
-                                }
-                            return true;
-                        } catch (Exception e) {
-                            return false;
+
+                                    }
+                                ContentValues values = new ContentValues();
+                                getItem(position).setUrl(file.getAbsolutePath());
+                                values.put(PodcastProviderContract.FILE_URI, file.getAbsolutePath());
+                                int result = getContext().getContentResolver().update(PodcastProviderContract.EPISODE_LIST_URI, values, PodcastProviderContract.EPISODE_LINK + "=?", new String[]{getItem(position).getLink()});
+
+                                return true;
+                            } catch (Exception e) {
+                                return false;
+                            }
                         }
                     }
+
+                    new DownloadFile().execute("");
                 }
-
-                new DownloadFile().execute("");
-            }
-        });
-
+            });
+        }
         return convertView;
     }
 

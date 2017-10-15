@@ -7,7 +7,7 @@ public class ItemFeed implements Serializable {
     private final String link;
     private final String pubDate;
     private final String description;
-    private final String url;
+    private  String url;
 
 
     public ItemFeed(String title, String link, String pubDate, String description, String url) {
@@ -35,6 +35,8 @@ public class ItemFeed implements Serializable {
     }
 
     public String getUrl() { return url; }
+    public void setUrl(String url){this.url = url;}
+
 
 
     @Override

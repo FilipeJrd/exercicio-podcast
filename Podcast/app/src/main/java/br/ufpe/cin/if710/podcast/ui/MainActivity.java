@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -88,20 +89,31 @@ public class MainActivity extends Activity {
         @Override
         protected Void doInBackground(String... params) {
             List<ItemFeed> itemList = new ArrayList<>();
+            List<String> ids = new ArrayList<>();
             try {
                 itemList = XmlFeedParser.parse(getRssFeed(params[0]));
-                if (itemList.size() > 0) {
-                    getContentResolver().delete(PodcastProviderContract.EPISODE_LIST_URI,null,null);
-                    for (ItemFeed item : itemList) {
 
+                if (itemList.size() > 0) {
+                    for (ItemFeed item: itemList) {
+                        ids.add("'"+item.getLink()+"'");
+                    }
+
+                    getContentResolver().delete(PodcastProviderContract.EPISODE_LIST_URI,PodcastProviderContract.EPISODE_LINK+" NOT IN ("+ TextUtils.join(",",ids)+")",null);
+
+
+                    for (ItemFeed item : itemList) {
                         ContentValues values = new ContentValues();
+
                         values.put(PodcastProviderContract.DATE, item.getPubDate());
                         values.put(PodcastProviderContract.DESCRIPTION, item.getDescription());
                         values.put(PodcastProviderContract.TITLE, item.getTitle());
-                        values.put(PodcastProviderContract.EPISODE_LINK, item.getLink());
 
+                        int result = -getContentResolver().update(PodcastProviderContract.EPISODE_LIST_URI, values, PodcastProviderContract.EPISODE_LINK + "=?", new String[]{"'"+item.getLink()+"'"});
+                        if (result <= 0){
+                            values.put(PodcastProviderContract.EPISODE_LINK, item.getLink());
 
-                        getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, values);
+                            getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, values);
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -124,7 +136,7 @@ public class MainActivity extends Activity {
                     String description = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DESCRIPTION));
                     String link = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.EPISODE_LINK));
                     String date = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DATE));
-                    String url = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.EPISODE_LINK));
+                    String url = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.FILE_URI));
                     feed.add(new ItemFeed(title,link,date,description,url));
                 }
             } finally {
