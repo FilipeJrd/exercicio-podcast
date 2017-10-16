@@ -56,7 +56,7 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
 
             holder.item_title.setText(getItem(position).getTitle());
             holder.item_date.setText(getItem(position).getPubDate());
-
+            holder.item_action.setText("Play");
             holder.item_action.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -70,6 +70,19 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
                         player.setDataSource(file.getAbsolutePath());
                         player.prepare();
                         player.start();
+                        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mediaPlayer) {
+                                String filename = getItem(position).getUrl();
+                                File file = new File(filename);
+                                ContentValues values = new ContentValues();
+                                getItem(position).setUrl(null);
+                                values.put(PodcastProviderContract.FILE_URI, (String) null);
+                                int result = getContext().getContentResolver().update(PodcastProviderContract.EPISODE_LIST_URI, values, PodcastProviderContract.EPISODE_LINK + "=?", new String[]{getItem(position).getLink()});
+
+                                holder.item_action.setText("Baixar");
+                            }
+                        });
                     } catch (IOException e) {
                     }
                 }
@@ -105,6 +118,19 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
                                             player.setDataSource(file.getAbsolutePath());
                                             player.prepare();
                                             player.start();
+                                            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                                @Override
+                                                public void onCompletion(MediaPlayer mediaPlayer) {
+                                                    String filename = getItem(position).getUrl();
+                                                    File file = new File(filename);
+                                                    ContentValues values = new ContentValues();
+                                                    getItem(position).setUrl(null);
+                                                    values.put(PodcastProviderContract.FILE_URI, (String) null);
+                                                    int result = getContext().getContentResolver().update(PodcastProviderContract.EPISODE_LIST_URI, values, PodcastProviderContract.EPISODE_LINK + "=?", new String[]{getItem(position).getLink()});
+
+                                                    holder.item_action.setText("Baixar");
+                                                }
+                                            });
                                         } catch (IOException e) {
                                         }
                                     }

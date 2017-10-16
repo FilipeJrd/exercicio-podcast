@@ -21,8 +21,8 @@ public class EpisodeDetailActivity extends Activity {
         Bundle bundle = getIntent().getExtras();
         ItemFeed item = (ItemFeed) bundle.getSerializable("item");
         if(item != null){
-            this.description.setText(item.getDescription());
-            this.title.setText(item.getTitle());
+            this.description.setText("Description: "+item.getDescription());
+            this.title.setText("Title: "+item.getTitle());
         }
     }
 }

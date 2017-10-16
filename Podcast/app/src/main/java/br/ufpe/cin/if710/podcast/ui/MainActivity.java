@@ -83,6 +83,8 @@ public class MainActivity extends Activity {
         Intent rssService = new Intent(getApplicationContext(),RSSDownloadService.class);
         rssService.putExtra("url",RSS_FEED);
         startService(rssService);
+        this.displayData();
+
     }
 
     @Override
@@ -92,47 +94,51 @@ public class MainActivity extends Activity {
         adapter.clear();
     }
 
+    public void displayData(){
+        Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
+
+        Cursor cursor = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,PodcastProviderContract.ALL_COLUMNS,null,null,null);
+        List<ItemFeed> feed = new ArrayList<ItemFeed>();
+        try {
+            while (cursor.moveToNext()) {
+                String title = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.TITLE));
+                String description = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DESCRIPTION));
+                String link = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.EPISODE_LINK));
+                String date = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DATE));
+                String url = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.FILE_URI));
+                int position = cursor.getInt(cursor.getColumnIndex(PodcastProviderContract.EPISODE_POSITION));
+
+                feed.add(new ItemFeed(title,link,date,description,url,position));
+            }
+        } finally {
+            cursor.close();
+            //Adapter Personalizado
+            XmlFeedAdapter adapter = new XmlFeedAdapter(getApplicationContext(), R.layout.itemlista, feed);
+
+            items.setAdapter(adapter);
+            items.setTextFilterEnabled(true);
+
+            items.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    XmlFeedAdapter adapter = (XmlFeedAdapter) parent.getAdapter();
+                    ItemFeed item = adapter.getItem(position);
+                    //atualizar o list view
+                    Intent intent = new Intent(MainActivity.this,EpisodeDetailActivity.class);
+                    intent.putExtra("item",item);
+
+                    MainActivity.this.startActivity(intent);
+                }
+            });
+        }
+    }
+
 
     public class RSSDownloadBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("br.ufpe.cin.if710.podcast.FINISHED_DOWNLOAD")){
-                Toast.makeText(context, "terminando...", Toast.LENGTH_SHORT).show();
-
-                Cursor cursor = context.getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,PodcastProviderContract.ALL_COLUMNS,null,null,null);
-                List<ItemFeed> feed = new ArrayList<ItemFeed>();
-                try {
-                    while (cursor.moveToNext()) {
-                        String title = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.TITLE));
-                        String description = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DESCRIPTION));
-                        String link = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.EPISODE_LINK));
-                        String date = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DATE));
-                        String url = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.FILE_URI));
-                        int position = cursor.getInt(cursor.getColumnIndex(PodcastProviderContract.EPISODE_POSITION));
-
-                        feed.add(new ItemFeed(title,link,date,description,url,position));
-                    }
-                } finally {
-                    cursor.close();
-                    //Adapter Personalizado
-                    XmlFeedAdapter adapter = new XmlFeedAdapter(context, R.layout.itemlista, feed);
-
-                    items.setAdapter(adapter);
-                    items.setTextFilterEnabled(true);
-
-                    items.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            XmlFeedAdapter adapter = (XmlFeedAdapter) parent.getAdapter();
-                            ItemFeed item = adapter.getItem(position);
-                            //atualizar o list view
-                            Intent intent = new Intent(MainActivity.this,EpisodeDetailActivity.class);
-                            intent.putExtra("item",item);
-
-                            MainActivity.this.startActivity(intent);
-                        }
-                    });
-                }
+                displayData();
             }
         }
     }
