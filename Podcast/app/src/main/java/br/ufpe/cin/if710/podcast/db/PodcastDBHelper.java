@@ -30,6 +30,7 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
     public final static String EPISODE_LINK = "link";
     public final static String EPISODE_DESC = "description";
     public final static String EPISODE_FILE_URI = "downloadLocationUri";
+    public final static String EPISODE_POSITION = "position";
 
     public final static String[] columns = {
             _ID, EPISODE_TITLE, EPISODE_DATE, EPISODE_LINK,
@@ -42,7 +43,9 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
                     + EPISODE_DATE + " TEXT NOT NULL, "
                     + EPISODE_LINK + " TEXT NOT NULL, "
                     + EPISODE_DESC + " TEXT NOT NULL, "
-                    + EPISODE_FILE_URI + " TEXT)";
+                    + EPISODE_FILE_URI + " TEXT, "
+                    + EPISODE_POSITION + " INTEGER "
+                    + ")";
 
 
 

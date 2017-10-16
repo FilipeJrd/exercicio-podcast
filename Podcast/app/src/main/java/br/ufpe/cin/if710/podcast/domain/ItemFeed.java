@@ -8,14 +8,16 @@ public class ItemFeed implements Serializable {
     private final String pubDate;
     private final String description;
     private  String url;
+    private int position;
 
 
-    public ItemFeed(String title, String link, String pubDate, String description, String url) {
+    public ItemFeed(String title, String link, String pubDate, String description, String url, int position) {
         this.title = title;
         this.link = link;
         this.pubDate = pubDate;
         this.description = description;
         this.url = url;
+        this.position = position;
     }
 
     public String getTitle() {
@@ -32,6 +34,14 @@ public class ItemFeed implements Serializable {
 
     public String getDescription() {
         return description;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public String getUrl() { return url; }

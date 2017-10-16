@@ -46,6 +46,7 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
             holder.item_title = (TextView) convertView.findViewById(R.id.item_title);
             holder.item_date = (TextView) convertView.findViewById(R.id.item_date);
             holder.item_action = (Button) convertView.findViewById(R.id.item_action);
+
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -55,7 +56,7 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
 
             holder.item_title.setText(getItem(position).getTitle());
             holder.item_date.setText(getItem(position).getPubDate());
-            holder.item_action.setText("Play");
+
             holder.item_action.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -210,5 +211,6 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
         TextView item_title;
         TextView item_date;
         Button item_action;
+        Boolean isPlaying = false;
     }
 }
