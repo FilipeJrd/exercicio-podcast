@@ -11,9 +11,7 @@ import java.util.List;
 
 public class XmlFeedParser {
 
-    public static List<ItemFeed> parse(String xmlFeed) throws XmlPullParserException, IOException {
-        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-        XmlPullParser xpp = factory.newPullParser();
+    public static List<ItemFeed> parse(String xmlFeed, XmlPullParser xpp) throws XmlPullParserException, IOException {
         xpp.setInput(new StringReader(xmlFeed));
         xpp.nextTag();
         return readRss(xpp);

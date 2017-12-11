@@ -5,7 +5,9 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,10 +33,12 @@ public class RSSDownloadService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         String url = intent.getStringExtra("url");
-        List<ItemFeed> itemList = new ArrayList<>();
+        List<ItemFeed> itemList;
         List<String> ids = new ArrayList<>();
         try {
-            itemList = XmlFeedParser.parse(getRssFeed(url));
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            XmlPullParser xpp = factory.newPullParser();
+            itemList = XmlFeedParser.parse(getRssFeed(url), xpp);
 
             if (itemList.size() > 0) {
                 for (ItemFeed item: itemList) {
