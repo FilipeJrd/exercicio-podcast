@@ -25,10 +25,9 @@ public class XmlFeedParserTest {
     @Test
     public void RssParserTest() throws Exception{
         ItemFeed[] correctItems = { new ItemFeed("Ciência e Pseudociência","http://dstats.net/download/http://www6.ufrgs.br/frontdaciencia/arquivos/Fronteiras_da_Ciencia-E001-Ciencia-e-Pseudociencia-07.06.2010.mp3","Sun, 20 Jun 2010 10:40:05 GMT","Programa 1","",0)};
-        String xmlString = "";
-
-        when(xpp.next()).thenReturn(2)
-
+        
+        when(xpp.next())
+                .thenReturn(2)
                 .thenReturn(2)
                 .thenReturn(2)
                 .thenReturn(4)
@@ -40,8 +39,8 @@ public class XmlFeedParserTest {
                 .thenReturn(3)
                 .thenReturn(3);
 
-        when(xpp.getEventType()).thenReturn(2)
-
+        when(xpp.getEventType())
+                .thenReturn(2)
                 .thenReturn(2)
                 .thenReturn(2)
                 .thenReturn(2)
@@ -50,10 +49,22 @@ public class XmlFeedParserTest {
                 .thenReturn(3)
                 .thenReturn(3);
 
-        when(xpp.getAttributeValue(null,"url")).thenReturn("http://dstats.net/download/http://www6.ufrgs.br/frontdaciencia/arquivos/Fronteiras_da_Ciencia-E001-Ciencia-e-Pseudociencia-07.06.2010.mp3");
-        when(xpp.getText()).thenReturn("Ciência e Pseudociência").thenReturn("Programa 1").thenReturn("Sun, 20 Jun 2010 10:40:05 GMT");
-        when(xpp.getName()).thenReturn("channel").thenReturn("item")
-        .thenReturn("title").thenReturn("description").thenReturn("pubDate").thenReturn("enclosure");
+        when(xpp.getAttributeValue(null,"url"))
+                .thenReturn("http://dstats.net/download/http://www6.ufrgs.br/frontdaciencia/arquivos/Fronteiras_da_Ciencia-E001-Ciencia-e-Pseudociencia-07.06.2010.mp3");
+
+        when(xpp.getText())
+                .thenReturn("Ciência e Pseudociência")
+                .thenReturn("Programa 1")
+                .thenReturn("Sun, 20 Jun 2010 10:40:05 GMT");
+
+
+        when(xpp.getName())
+                .thenReturn("channel")
+                .thenReturn("item")
+                .thenReturn("title")
+                .thenReturn("description")
+                .thenReturn("pubDate")
+                .thenReturn("enclosure");
         List<ItemFeed> items = XmlFeedParser.parse(xmlString,xpp);
 
         assertEquals(correctItems.length,items.size());
