@@ -25,7 +25,7 @@ public class XmlFeedParserTest {
     @Test
     public void RssParserTest() throws Exception{
         ItemFeed[] correctItems = { new ItemFeed("Ciência e Pseudociência","http://dstats.net/download/http://www6.ufrgs.br/frontdaciencia/arquivos/Fronteiras_da_Ciencia-E001-Ciencia-e-Pseudociencia-07.06.2010.mp3","Sun, 20 Jun 2010 10:40:05 GMT","Programa 1","",0)};
-        
+
         when(xpp.next())
                 .thenReturn(2)
                 .thenReturn(2)
@@ -65,7 +65,7 @@ public class XmlFeedParserTest {
                 .thenReturn("description")
                 .thenReturn("pubDate")
                 .thenReturn("enclosure");
-        List<ItemFeed> items = XmlFeedParser.parse(xmlString,xpp);
+        List<ItemFeed> items = XmlFeedParser.parse("",xpp);
 
         assertEquals(correctItems.length,items.size());
 
