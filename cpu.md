@@ -29,3 +29,9 @@ Quando se trata da reprodução dos episódios do podcast a CPU só tem um pico 
 O uso de CPU nas outras Activities (Settings Activity e Detail Activity) é o mesmo e só é "significativo" no momento de sua inicialização que é de 10% de uso. Após isso ele fica no estado idle  com o uso de 1% da CPU.
 
 ![CPU4](https://github.com/FilipeJrd/exercicio-podcast/blob/master/prints/studio64_2017-12-13_13-48-31.png)
+
+## Android Dev Metrics
+
+Outras métricas foram capturadas com o Android Dev Metrics, como as mostradas abaixo
+
+![CPU5](https://github.com/FilipeJrd/exercicio-podcast/blob/master/prints/qemu-system-i386_2017-12-13_16-07-04.png)
