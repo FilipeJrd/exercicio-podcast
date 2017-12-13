@@ -46,5 +46,4 @@ public class RSSDownloaderTest extends ProviderTestCase2 {
 
         assertEquals("The download was not successful",true,success);
     }
-
 }

@@ -1,5 +1,6 @@
 package br.ufpe.cin.if710.podcast.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
@@ -115,43 +116,52 @@ public class MainActivity extends Activity {
         unregisterReceiver(receiver);
     }
 
+    @SuppressLint("StaticFieldLeak")
     public void displayData(){
         Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
+        new AsyncTask<Void, Void, List<ItemFeed>>() {
+            @Override
+            protected List<ItemFeed> doInBackground(Void... params) {
+                Cursor cursor = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,PodcastProviderContract.ALL_COLUMNS,null,null,null);
+                List<ItemFeed> feed = new ArrayList<ItemFeed>();
+                try {
+                    while (cursor.moveToNext()) {
+                        String title = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.TITLE));
+                        String description = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DESCRIPTION));
+                        String link = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.EPISODE_LINK));
+                        String date = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DATE));
+                        String url = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.FILE_URI));
+                        int position = cursor.getInt(cursor.getColumnIndex(PodcastProviderContract.EPISODE_POSITION));
 
-        Cursor cursor = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,PodcastProviderContract.ALL_COLUMNS,null,null,null);
-        List<ItemFeed> feed = new ArrayList<ItemFeed>();
-        try {
-            while (cursor.moveToNext()) {
-                String title = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.TITLE));
-                String description = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DESCRIPTION));
-                String link = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.EPISODE_LINK));
-                String date = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.DATE));
-                String url = cursor.getString(cursor.getColumnIndex(PodcastProviderContract.FILE_URI));
-                int position = cursor.getInt(cursor.getColumnIndex(PodcastProviderContract.EPISODE_POSITION));
-
-                feed.add(new ItemFeed(title,link,date,description,url,position));
-            }
-        } finally {
-            cursor.close();
-            //Adapter Personalizado
-            XmlFeedAdapter adapter = new XmlFeedAdapter(getApplicationContext(), R.layout.itemlista, feed);
-
-            items.setAdapter(adapter);
-            items.setTextFilterEnabled(true);
-
-            items.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    XmlFeedAdapter adapter = (XmlFeedAdapter) parent.getAdapter();
-                    ItemFeed item = adapter.getItem(position);
-                    //atualizar o list view
-                    Intent intent = new Intent(MainActivity.this,EpisodeDetailActivity.class);
-                    intent.putExtra("item",item);
-
-                    MainActivity.this.startActivity(intent);
+                        feed.add(new ItemFeed(title,link,date,description,url,position));
+                    }
+                } finally {
+                    cursor.close();
+                    return feed;
                 }
-            });
-        }
+            }
+
+            @Override
+            protected void onPostExecute(List<ItemFeed> feed) {
+                XmlFeedAdapter adapter = new XmlFeedAdapter(getApplicationContext(), R.layout.itemlista, feed);
+
+                items.setAdapter(adapter);
+                items.setTextFilterEnabled(true);
+
+                items.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        XmlFeedAdapter adapter = (XmlFeedAdapter) parent.getAdapter();
+                        ItemFeed item = adapter.getItem(position);
+                        //atualizar o list view
+                        Intent intent = new Intent(MainActivity.this,EpisodeDetailActivity.class);
+                        intent.putExtra("item",item);
+
+                        MainActivity.this.startActivity(intent);
+                    }
+                });
+            }
+        }.execute();
     }
 
 

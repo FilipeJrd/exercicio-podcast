@@ -33,3 +33,14 @@ Caso de teste responsável por validar o funcionamento do download de um arquivo
 
 Uma vez que a extração foi realizada foi desenvolvido um caso de teste para essa nova classe, onde é passado a url de um arquivo RSS e é requisitado  seu download, por se tratar de um teste de integração todo o comportamento é testado fazendo com que de fato seja necessário o download, parsing e armazenamento dos dados. Por fim se o resultado da operação for true o teste é considerado bem sucedido.
 
+
+# Testes UI
+
+## openDetailsForFirst_Test
+
+Caso de teste responsável por validar a tela de detalhes para os primeiros 4 podcasts presentes na lista, uma vez que esse teste é executado cada tela de detalhes é aberta por vez verificando se os valores são corretamente preenchidos.
+
+## checkFirstFourItems_Test
+
+Caso de teste responsável por validar se os quatro primeiros elementos do FeedRSS estão com os valores corretamente preenchidos, checando valores como title e date.
+
