@@ -4,6 +4,8 @@ Para as análises de CPU citadas neste documento, foram utilizadas algumas ferra
 
 Este documento está dividido em seções que correspondem as telas e atividades da aplicação.
 
+OBS: Todas as análises e capturas de métricas foram feitas antes da implementação do Room e do LiveData
+
 ## Início da atividade da Home Screen
 
 Na home screen, o uso significativo da CPU ocorre em um curto período de tempo que corresponde a execução da consulta no banco de dados para a população do list view correspondente a lista de podcasts e da chamada de rede feita para a atualização e download de novos elementos para esta lista. O uso da cpu nestes dois casos é na faixa de 35% para realização destas operações em um intervalo de tempo de 3.5 segundos.
