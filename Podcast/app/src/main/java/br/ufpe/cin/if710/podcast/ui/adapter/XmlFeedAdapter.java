@@ -198,7 +198,6 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
                             }
                         }
                     }
-
                     new DownloadFile().execute("");
                 }
             });
