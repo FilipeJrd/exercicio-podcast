@@ -6,7 +6,7 @@ Este documento está dividido em seções que correspondem as telas e atividades
 
 ## Memory Leaks na aplicação
 
-Com o auxílio do Canary Leak, achamos um memory leak na nossa aplicação. Ele ocorria na MainActivity e era causado por causa de um Receiver que não era desregistrado nunca. Era um leak de 9.5KB que foi resolvido com o seguinte trecho de código.
+Com o auxílio do Canary Leak, achamos um memory leak na nossa aplicação. Ele ocorria na MainActivity e era causado por causa de um Receiver que não era desregistrado nunca. Era um leak de 6.9KB que foi resolvido com o seguinte trecho de código.
 
 ![MEM1](https://github.com/FilipeJrd/exercicio-podcast/blob/master/prints/studio64_2017-12-13_13-59-10.png)
 
