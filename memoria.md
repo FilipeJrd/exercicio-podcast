@@ -11,6 +11,7 @@ Com o auxílio do Canary Leak, achamos um memory leak na nossa aplicação. Ele 
 ![MEM1](https://github.com/FilipeJrd/exercicio-podcast/blob/master/prints/studio64_2017-12-13_13-59-10.png)
 
 As imagens do memory leak capturadas pelo leak canary são as seguintes:
+
 ![MEM2](https://github.com/FilipeJrd/exercicio-podcast/blob/master/prints/firefox_2017-12-12_20-05-58.png)
 
 ![MEM3](https://github.com/FilipeJrd/exercicio-podcast/blob/master/prints/qemu-system-i386_2017-12-12_20-06-14.png)
