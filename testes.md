@@ -3,6 +3,8 @@
 Para validar o correto funcionamento da aplicação foram realizados testes unitários, de integração e de UI.
 Durante esse processo foi percebida a necessidade de realizar alterações em certas partes do código de modo que cada pedaço se tornasse mais facilmente testado.
 
+OBS: Todos os testes foram feitos antes da adição do Room e do LiveData, infelizmente por questões de tempo não foi possível atualizar os testes, mas os testes do content provider continuam funcionando mesmo após o update (por que deixamos algumas partes vivas só para mostrar o funcionamento dos testes, mesmo que não elas não estejam mais sendo usadas).
+
 A descrição do processo segue a seguir.
 
 ## ItemFeedTest:
