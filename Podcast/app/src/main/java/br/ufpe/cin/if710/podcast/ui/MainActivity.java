@@ -17,6 +17,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.squareup.leakcanary.LeakCanary;
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.ByteArrayOutputStream;
@@ -37,7 +39,9 @@ import br.ufpe.cin.if710.podcast.ui.adapter.XmlFeedAdapter;
 
 public class MainActivity extends Activity {
 
-    //ao fazer envio da resolucao, use este link no seu codigo!
+    private RSSDownloadBroadcastReceiver receiver;
+
+    //string do xml
     private final String RSS_FEED = "http://leopoldomt.com/if710/fronteirasdaciencia.xml";
     //TODO teste com outros links de podcast
 
@@ -47,13 +51,29 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        IntentFilter filter = new IntentFilter("br.ufpe.cin.if710.podcast.FINISHED_DOWNLOAD");
-        RSSDownloadBroadcastReceiver receiver = new RSSDownloadBroadcastReceiver();
-        registerReceiver(receiver,filter);
-
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this.getApplication());
         items = (ListView) findViewById(R.id.items);
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        IntentFilter filter = new IntentFilter("br.ufpe.cin.if710.podcast.FINISHED_DOWNLOAD");
+        receiver = new RSSDownloadBroadcastReceiver();
+        registerReceiver(receiver,filter);
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -92,6 +112,7 @@ public class MainActivity extends Activity {
         super.onStop();
         XmlFeedAdapter adapter = (XmlFeedAdapter) items.getAdapter();
         adapter.clear();
+        unregisterReceiver(receiver);
     }
 
     public void displayData(){
