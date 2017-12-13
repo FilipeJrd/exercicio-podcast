@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import br.ufpe.cin.if710.podcast.R;
+import br.ufpe.cin.if710.podcast.db.PodcastDatabase;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 
@@ -184,13 +185,15 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
                                     // publishing the progress....
                                     if (fileLength > 0) // only if total length is known
                                         publishProgress((int) (total * 100 / fileLength));
-                                    output.write(data, 0, count);
+                                        output.write(data, 0, count);
 
                                     }
                                 ContentValues values = new ContentValues();
                                 getItem(position).setUrl(file.getAbsolutePath());
                                 values.put(PodcastProviderContract.FILE_URI, file.getAbsolutePath());
-                                int result = getContext().getContentResolver().update(PodcastProviderContract.EPISODE_LIST_URI, values, PodcastProviderContract.EPISODE_LINK + "=?", new String[]{getItem(position).getLink()});
+                                PodcastDatabase database = PodcastDatabase.getInstance(getContext());
+
+                                database.itemFeedDao().updateItem(getItem(position));
 
                                 return true;
                             } catch (Exception e) {

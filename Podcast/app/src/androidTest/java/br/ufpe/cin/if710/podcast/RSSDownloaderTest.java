@@ -1,5 +1,6 @@
 package br.ufpe.cin.if710.podcast;
 
+import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.test.InstrumentationRegistry;
@@ -13,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import br.ufpe.cin.if710.podcast.db.PodcastDatabase;
 import br.ufpe.cin.if710.podcast.db.PodcastProvider;
 
 /**
@@ -25,24 +27,29 @@ public class RSSDownloaderTest extends ProviderTestCase2 {
         super(PodcastProvider.class, "br.ufpe.cin.if710.podcast.feed");
     }
 
+
+    private PodcastDatabase database;
+
     @Before
     @Override
     public void setUp() throws Exception {
         super.setUp();
         setContext(InstrumentationRegistry.getTargetContext());
+        this.database = Room.inMemoryDatabaseBuilder(getMockContext(), PodcastDatabase.class).build();
     }
 
     @After
     @Override
     public void tearDown() throws Exception{
         super.tearDown();
+        this.database.close();
     }
 
     @Test
     public void test() throws Exception{
         RSSDownloader downloader = new RSSDownloader();
 
-        boolean success = downloader.startDownload("http://leopoldomt.com/if710/fronteirasdaciencia.xml", this.getMockContext());
+        boolean success = downloader.startDownload("http://leopoldomt.com/if710/fronteirasdaciencia.xml", this.database);
 
         assertEquals("The download was not successful",true,success);
     }

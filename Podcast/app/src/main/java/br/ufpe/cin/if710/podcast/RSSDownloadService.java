@@ -1,6 +1,7 @@
 package br.ufpe.cin.if710.podcast;
 
 import android.app.IntentService;
+import android.arch.persistence.room.Room;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.text.TextUtils;
@@ -17,6 +18,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.ufpe.cin.if710.podcast.db.PodcastDatabase;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 import br.ufpe.cin.if710.podcast.domain.XmlFeedParser;
@@ -35,7 +37,8 @@ public class RSSDownloadService extends IntentService {
         String url = intent.getStringExtra("url");
         RSSDownloader downloader = new RSSDownloader();
 
-        boolean success = downloader.startDownload(url, this);
+        PodcastDatabase database = PodcastDatabase.getInstance(getApplicationContext());
+        boolean success = downloader.startDownload(url, database);
 
         if (success) {
             Intent broadcastIntent = new Intent();

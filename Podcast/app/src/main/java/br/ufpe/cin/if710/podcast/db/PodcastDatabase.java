@@ -12,7 +12,6 @@ import android.arch.persistence.room.Room;
  * Created by filipejordao on 13/12/17.
  */
 @Database(entities = {ItemFeed.class}, version = 1)
-
 public abstract class PodcastDatabase extends RoomDatabase {
 
     private static PodcastDatabase instance;

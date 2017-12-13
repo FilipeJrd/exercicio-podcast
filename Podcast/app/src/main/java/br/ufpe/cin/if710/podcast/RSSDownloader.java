@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.ufpe.cin.if710.podcast.db.PodcastDatabase;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 import br.ufpe.cin.if710.podcast.domain.XmlFeedParser;
@@ -25,7 +26,7 @@ import br.ufpe.cin.if710.podcast.domain.XmlFeedParser;
  */
 
 public class RSSDownloader {
-    public boolean startDownload(String url, Context context) {
+    public boolean startDownload(String url, PodcastDatabase database) {
         List<ItemFeed> itemList;
         List<String> ids = new ArrayList<>();
         try {
@@ -38,21 +39,19 @@ public class RSSDownloader {
                     ids.add("'"+item.getLink()+"'");
                 }
 
-                context.getContentResolver().delete(PodcastProviderContract.EPISODE_LIST_URI,PodcastProviderContract.EPISODE_LINK+" NOT IN ("+ TextUtils.join(",",ids)+")",null);
-
                 for (ItemFeed item : itemList) {
+                    /*
                     ContentValues values = new ContentValues();
 
                     values.put(PodcastProviderContract.DATE, item.getPubDate());
                     values.put(PodcastProviderContract.DESCRIPTION, item.getDescription());
                     values.put(PodcastProviderContract.TITLE, item.getTitle());
+*/
 
-                    int result = -context.getContentResolver().update(PodcastProviderContract.EPISODE_LIST_URI, values, PodcastProviderContract.EPISODE_LINK + "=?", new String[]{"'"+item.getLink()+"'"});
-                    if (result <= 0){
-                        values.put(PodcastProviderContract.EPISODE_LINK, item.getLink());
+                        /*values.put(PodcastProviderContract.EPISODE_LINK, item.getLink());
                         values.put(PodcastProviderContract.EPISODE_POSITION,0);
-                        context.getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, values);
-                    }
+                        context.getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI, values);*/
+                    database.itemFeedDao().insertItem(item);
                 }
                 return true;
             }
